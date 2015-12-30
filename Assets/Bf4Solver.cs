@@ -20,7 +20,7 @@ public class Bf4Solver : MonoBehaviour {
 	public Toggle[] LampButtons;
 	public Text SolutionLabel;
 	public Text HelpLabel;
-
+	public GameObject HelpPanel;
 
 	private static readonly int locationCount = Enum.GetNames(typeof(Location)).Length;
 	public static readonly int buttonLocationCount = locationCount - 2;
@@ -36,8 +36,19 @@ public class Bf4Solver : MonoBehaviour {
 			var l = (Location) i;
 			Map.Add(l, PlayerPrefs.GetInt(l.ToString(), 0));
 		}
+		HelpLabel.text =
+			"1) Select \"Initial lamp status\". Mark the LIT LAMPS** with the lamp buttons.\n" +
+			"\n2) Select another location checkbox. Press the corresponding button in BF4.\n" +
+			"\n3) Mark which lamps CHANGED state compared to the \"Initial lamp status\"\n" +
+			"\n4) Go back and unpress the button in BF4 (so you always compare to initial state)\n" +
+			"\n5) Repeat steps 2,3 and 4 for all locations\n" +
+			"\n6) Mark which lamps are CURRENTLY LIT (**) under \"Current lamp status\".\n" +
+			"\n7) Press \"Solve\"\n" +
+			"\n?) No answer found? Repeat steps 2 and 3 to be sure you have marked the lamps right at all locations and repeat steps 6 and 7\n ";
+			
 		//SetTestData();
 		LocationChanged(true);
+		HelpPanel.SetActive(true);
 		initialized = true;
 	}
 
@@ -66,6 +77,7 @@ public class Bf4Solver : MonoBehaviour {
 	}
 
 	public void LocationChanged(bool b) {
+		HelpPanel.SetActive(false);
 		var i = 0;
 		foreach (var location in Locations) {
 			if (location.isOn) {
@@ -84,13 +96,11 @@ public class Bf4Solver : MonoBehaviour {
 
 	public void SolvePressed() {
 		SolutionLabel.text = new Bf4SolutionFinder().Solve(Map).ToString();
-		SolutionLabel.enabled = true;
-		HelpLabel.enabled = false;
+		HelpPanel.SetActive(false);
 	}
 
 	public void HelpPressed() {
-		SolutionLabel.enabled = false;
-		HelpLabel.enabled = true;
+		HelpPanel.SetActive(true);
 	}
 
 	private void SaveLampStatuses() {
